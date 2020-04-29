@@ -29,7 +29,7 @@ class Authenticator {
     window.localStorage.remove('openid_client:auth');
   }
 
-  void logout() async {
+  Future logout() async {
     _clearState();
     var creds = await credential;
     await creds.logout();
