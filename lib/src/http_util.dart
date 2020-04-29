@@ -27,7 +27,6 @@ dynamic _processResponse(http.Response response) {
   _logger.fine(
       '${response.request.method} ${response.request.url}: ${response.body}');
 
-  print(response.body);
   return response.body.length > 0 ? json.decode(response.body) : {};
 }
 

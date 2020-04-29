@@ -29,10 +29,9 @@ class Authenticator {
     window.localStorage.remove('openid_client:auth');
   }
 
-  Future logout() async {
+  void logout() {
     _clearState();
-    var creds = await credential;
-    await creds.logout();
+    window.location.href = flow.logoutUri.toString();
   }
 
   static Future<Credential> _credentialFromUri(Flow flow) async {

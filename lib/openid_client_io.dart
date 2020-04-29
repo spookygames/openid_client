@@ -36,6 +36,17 @@ class Authenticator {
     return flow.callback(response);
   }
 
+  Future logout() async {
+    var state = flow.state;
+
+    _requestsByState[state] = Completer();
+    await _startServer(port);
+    urlLancher(flow.logoutUri.toString());
+
+    await _requestsByState[state].future;
+
+  }
+
   /// cancel the ongoing auth flow, i.e. when the user closed the webview/browser without a successful login
   Future<void> cancel() async {
     final state = flow.authenticationUri.queryParameters['state'];

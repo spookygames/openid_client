@@ -182,14 +182,6 @@ class Credential {
     return UserInfo.fromJson(await _get(uri));
   }
 
-  Future logout() async {
-    var uri = client.issuer.metadata.endSessionEndpoint;
-    if (uri == null) {
-      throw UnsupportedError('Issuer does not support endSession endpoint.');
-    }
-    return await _get(uri);
-  }
-
   http.Client createHttpClient([http.Client baseClient]) =>
       http.AuthorizedClient(baseClient ?? http.Client(), this);
 
@@ -302,6 +294,9 @@ class Flow {
   Uri get authenticationUri => client.issuer.metadata.authorizationEndpoint
       .replace(queryParameters: _authenticationUriParameters);
 
+  Uri get logoutUri => client.issuer.metadata.endSessionEndpoint
+      .replace(queryParameters: _logoutUriParameters);
+
   Map<String, String> _proofKeyForCodeExchange;
 
   final String _nonce = _randomString(16);
@@ -322,6 +317,16 @@ class Flow {
         'code_challenge': _proofKeyForCodeExchange['code_challenge']
       });
     }
+    return v;
+  }
+
+  Map<String, String> get _logoutUriParameters {
+    var v = {
+      'client_id': client.clientId,
+      'redirect_uri': redirectUri.toString(),
+      'state': state
+    };
+
     return v;
   }
 
