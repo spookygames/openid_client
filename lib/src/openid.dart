@@ -182,6 +182,14 @@ class Credential {
     return UserInfo.fromJson(await _get(uri));
   }
 
+  Future logout() async {
+    var uri = client.issuer.metadata.endSessionEndpoint;
+    if (uri == null) {
+      throw UnsupportedError('Issuer does not support endSession endpoint.');
+    }
+    return await _get(uri);
+  }
+
   http.Client createHttpClient([http.Client baseClient]) =>
       http.AuthorizedClient(baseClient ?? http.Client(), this);
 
@@ -214,6 +222,10 @@ class Credential {
     if (_token.accessToken != null &&
         _token.expiresAt.isAfter(DateTime.now())) {
       return _token;
+    }
+
+    if (_token.refreshToken == null) {
+      throw Exception('Access token expired and no refresh token available');
     }
 
     var json = await http.post(client.issuer.metadata.tokenEndpoint, body: {
@@ -280,7 +292,7 @@ class Flow {
   Flow.implicit(Client client, {String state})
       : this._(
             FlowType.implicit,
-            ['token id_token', 'id_token', 'token'].firstWhere((v) =>
+            ['token id_token', 'id_token token', 'id_token', 'token'].firstWhere((v) =>
                 client.issuer.metadata.responseTypesSupported.contains(v)),
             client,
             state: state);

@@ -26,7 +26,9 @@ Future post(dynamic url,
 dynamic _processResponse(http.Response response) {
   _logger.fine(
       '${response.request.method} ${response.request.url}: ${response.body}');
-  return json.decode(response.body);
+
+  print(response.body);
+  return response.body.length > 0 ? json.decode(response.body) : {};
 }
 
 Future<T> _withClient<T>(Future<T> Function(http.Client client) fn,

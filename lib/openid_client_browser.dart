@@ -18,15 +18,21 @@ class Authenticator {
           ..redirectUri = Uri.parse(window.location.href).removeFragment());
 
   void authorize() {
-    logout();
+    _clearState();
     window.localStorage['openid_client:state'] = flow.state;
     window.location.href = flow.authenticationUri.toString();
   }
 
-  void logout() {
+  void _clearState() {
     Platform.supportsTypedData;
     window.localStorage.remove('openid_client:state');
     window.localStorage.remove('openid_client:auth');
+  }
+
+  void logout() async {
+    _clearState();
+    var creds = await credential;
+    await creds.logout();
   }
 
   static Future<Credential> _credentialFromUri(Flow flow) async {
@@ -34,14 +40,13 @@ class Authenticator {
     if (window.localStorage.containsKey('openid_client:auth')) {
       q = json.decode(window.localStorage['openid_client:auth']);
     } else {
-      var uri = Uri(query: Uri.parse(window.location.href).fragment);
+      var uri = Uri(query: Uri.parse(window.location.href).fragment.replaceFirst("/", ""));
       q = uri.queryParameters;
       if (q.containsKey('access_token') ||
           q.containsKey('code') ||
           q.containsKey('id_token')) {
         window.localStorage['openid_client:auth'] = json.encode(q);
-        window.location.href =
-            Uri.parse(window.location.href).removeFragment().toString();
+        window.history.replaceState('', document.title, window.location.origin + window.location.pathname + window.location.search);
       }
     }
     try {
