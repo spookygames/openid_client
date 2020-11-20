@@ -323,8 +323,7 @@ class Flow {
   Map<String, String> get _logoutUriParameters {
     var v = {
       'client_id': client.clientId,
-      'redirect_uri': redirectUri.toString(),
-      'state': state
+      'redirect_uri': redirectUri.toString()
     };
 
     return v;
